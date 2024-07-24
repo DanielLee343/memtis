@@ -6,43 +6,47 @@
 
 int syscall_htmm_start = 449;
 int syscall_htmm_end = 450;
+int syscall_shared_mem_start = 451;
+int syscall_shared_mem_end = 452;
 
-long htmm_start(pid_t pid, int node)
+long shared_mem_start()
 {
-    return syscall(syscall_htmm_start, pid, node);
+    return syscall(syscall_shared_mem_start);
 }
 
-long htmm_end(pid_t pid)
+long shared_mem_end()
 {
-    return syscall(syscall_htmm_end, pid);
+    return syscall(syscall_shared_mem_end);
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
     pid_t pid;
     int state;
 
-    if (argc < 2) {
-	printf("Usage ./launch_bench [BENCHMARK]");	
-	htmm_end(-1);
-	return 0;
+    if (argc < 2)
+    {
+        printf("Usage ./launch_bench [BENCHMARK]");
+        shared_mem_end();
+        return 0;
     }
 
     pid = fork();
-    if (pid == 0) {
-	execvp(argv[1], &argv[1]);
-	perror("Fails to run bench");
-	exit(-1);
+    if (pid == 0)
+    {
+        execvp(argv[1], &argv[1]);
+        perror("Fails to run bench");
+        exit(-1);
     }
-#ifdef __NOPID
-    htmm_start(-1, 0);
-#else
-    htmm_start(pid, 0);
-#endif
+    // #ifdef __NOPID
+    //     htmm_start(-1, 0);
+    // #else
+    shared_mem_start();
+    // #endif
     printf("pid: %d\n", pid);
     waitpid(pid, &state, 0);
 
-    htmm_end(-1);
-    
+    shared_mem_end();
+
     return 0;
 }

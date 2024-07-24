@@ -9,8 +9,9 @@ qemu-system-x86_64 \
         -enable-kvm \
         -nographic \
         -pidfile vm.pid \
-        -object memory-backend-ram,size=8G,id=m0 \
-        -object memory-backend-ram,size=8G,id=m1 \
-        -numa node,nodeid=0,memdev=m0,cpus=0-9 \
-        -numa node,nodeid=1,memdev=m1 \
         2>&1 | tee vm.log
+
+        # -object memory-backend-ram,size=8G,id=m0 \
+        # -object memory-backend-ram,size=8G,id=m1 \
+        # -numa node,nodeid=0,memdev=m0,cpus=0-9 \
+        # -numa node,nodeid=1,memdev=m1 \

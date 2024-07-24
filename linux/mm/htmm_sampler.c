@@ -453,73 +453,183 @@ static int ksamplingd_run(void)
 #include <linux/mutex.h>
 #include <linux/kthread.h>
 #include <linux/delay.h>
-
-#define BUFFER_SIZE 4096
-
+#include <linux/cdev.h>
+#include <linux/io.h>
+#define BUFFER_SIZE_SHARED_MEM 4096
+#define DEVICE_NAME "shared_mem_dev"
+static int major_number;
 static char *shared_buffer;
 static int *buffer_size_ptr;
 static struct task_struct *shared_mem_thread;
 static struct mutex buffer_mutex;
+static dev_t dev_num;
+static struct cdev c_dev;
+static struct class *cl;
 
 // Kernel thread to monitor shared memory
 static int kernel_thread_fn(void *data)
 {
 	printk(KERN_INFO "enter kernel_thread\n");
 	while (!kthread_should_stop()) {
-		if (mutex_lock_interruptible(&buffer_mutex)) {
-			return -ERESTARTSYS;
-		}
-		printk(KERN_INFO "buffer_size_ptr: %d\n", buffer_size_ptr);
-
+		printk(KERN_INFO "buffer_size_ptr: %d\n",
+				*buffer_size_ptr);
 		if (*buffer_size_ptr > 0) {
+			if (mutex_lock_interruptible(&buffer_mutex)) {
+				return -ERESTARTSYS;
+			}
+
 			printk(KERN_INFO "Kernel received: %s\n",
 			       shared_buffer);
 			*buffer_size_ptr =
 				0; // Reset size to indicate consumption
+			mutex_unlock(&buffer_mutex);
 		}
 
-		// 	mutex_unlock(&buffer_mutex);
-		msleep(1000); // Sleep to reduce CPU usage
+		msleep(500); // Sleep to reduce CPU usage
+	}
+	return 0;
+}
+// File operations prototypes
+static int device_open(struct inode *, struct file *);
+static int device_release(struct inode *, struct file *);
+static int device_mmap(struct file *, struct vm_area_struct *);
+static struct file_operations fops = {
+	.open = device_open,
+	.release = device_release,
+	.mmap = device_mmap,
+};
+
+static int device_open(struct inode *inodep, struct file *filep)
+{
+	return 0;
+}
+
+static int device_release(struct inode *inodep, struct file *filep)
+{
+	return 0;
+}
+
+static int device_mmap(struct file *filep, struct vm_area_struct *vma)
+{
+	// Remap the kernel buffer to user space
+	// if (remap_pfn_range(vma, vma->vm_start,
+	// 		    virt_to_phys(shared_buffer) >> PAGE_SHIFT,
+	// 		    BUFFER_SIZE_SHARED_MEM, vma->vm_page_prot)) {
+	// 	return -EAGAIN;
+	// }
+	unsigned long pfn = virt_to_phys(shared_buffer) >> PAGE_SHIFT;
+	size_t size = vma->vm_end - vma->vm_start;
+
+	if (size > BUFFER_SIZE_SHARED_MEM) {
+		return -EINVAL;
+	}
+
+	if (remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot)) {
+		return -EAGAIN;
 	}
 	return 0;
 }
 int shared_mem_init(void)
 {
-	if (!shared_buffer) {
-		printk(KERN_INFO "enter shared mem init\n");
-		// Allocate a shared memory buffer
-		shared_buffer = kmalloc(BUFFER_SIZE, GFP_KERNEL);
-		if (!shared_buffer) {
-			printk(KERN_ERR "Failed to allocate shared memory\n");
-			return -ENOMEM;
-		}
-
-		// Initialize buffer size pointer
-		buffer_size_ptr =
-			(int *)(shared_buffer + BUFFER_SIZE - sizeof(int));
-		*buffer_size_ptr = 0;
-
-		mutex_init(&buffer_mutex);
-
-		// Create and start the kernel thread
-		shared_mem_thread = kthread_run(kernel_thread_fn, NULL,
-						"shared_mem_thread");
-		if (IS_ERR(shared_mem_thread)) {
-			kfree(shared_buffer);
-			printk(KERN_ERR "Failed to create kernel thread\n");
-			return PTR_ERR(shared_mem_thread);
-		}
+	if (shared_buffer) {
+		kfree(shared_buffer);
+		shared_buffer = NULL;
+	}
+	printk(KERN_INFO "creating device char\n");
+	if (alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME) < 0) {
+		return -1;
 	}
 
+	if ((cl = class_create(THIS_MODULE, DEVICE_NAME)) == NULL) {
+		unregister_chrdev_region(dev_num, 1);
+		return -1;
+	}
+
+	if (device_create(cl, NULL, dev_num, NULL, DEVICE_NAME) == NULL) {
+		class_destroy(cl);
+		unregister_chrdev_region(dev_num, 1);
+		return -1;
+	}
+
+	cdev_init(&c_dev, &fops);
+
+	if (cdev_add(&c_dev, dev_num, 1) == -1) {
+		device_destroy(cl, dev_num);
+		class_destroy(cl);
+		unregister_chrdev_region(dev_num, 1);
+		return -1;
+	}
+	// if (!shared_buffer) {
+
+	// Allocate a shared memory buffer
+	// shared_buffer = kmalloc(BUFFER_SIZE_SHARED_MEM, GFP_KERNEL);
+	// if (!shared_buffer) {
+	// 	printk(KERN_ERR "Failed to allocate shared memory\n");
+	// 	return -ENOMEM;
+	// }
+
+	// buffer_size_ptr =
+	// 	(int *)(shared_buffer + BUFFER_SIZE_SHARED_MEM - sizeof(int));
+	// *buffer_size_ptr = 0;
+	printk(KERN_INFO "changing shared buffer init\n");
+	shared_buffer =
+		(char *)__get_free_pages(GFP_KERNEL, get_order(BUFFER_SIZE));
+	if (!shared_buffer) {
+		cdev_del(&c_dev);
+		device_destroy(cl, dev_num);
+		class_destroy(cl);
+		unregister_chrdev_region(dev_num, 1);
+		return -ENOMEM;
+	}
+
+	memset(shared_buffer, 0, BUFFER_SIZE);
+	buffer_size_ptr = (int *)(shared_buffer + BUFFER_SIZE - sizeof(int));
+
+	mutex_init(&buffer_mutex);
+	// major_number = register_chrdev(0, DEVICE_NAME, &fops);
+	// if (major_number < 0) {
+	// 	kfree(shared_buffer);
+	// 	printk(KERN_ERR
+	// 	       "Failed to register character device\n");
+	// 	return major_number;
+	// }
+
+	// printk(KERN_INFO
+	//        "Shared memory device registered, major number: %d\n",
+	//        major_number);
+
+	// Create and start the kernel thread
+	shared_mem_thread =
+		kthread_run(kernel_thread_fn, NULL, "shared_mem_thread");
+	if (IS_ERR(shared_mem_thread)) {
+		kfree(shared_buffer);
+		cdev_del(&c_dev);
+		device_destroy(cl, dev_num);
+		class_destroy(cl);
+		unregister_chrdev_region(dev_num, 1);
+		printk(KERN_ERR "Failed to create kernel thread\n");
+		return PTR_ERR(shared_mem_thread);
+	}
+	// }
+
 	// Return the physical address of the shared buffer
-	return virt_to_phys(shared_buffer);
+	// return virt_to_phys(shared_buffer);
+	return 0;
 }
 void shared_mem_exit(void)
 {
+	printk(KERN_INFO "enter shared mem exit\n");
 	if (shared_mem_thread) {
+		printk(KERN_INFO "shared_mem not NULL, make it stop\n");
 		kthread_stop(shared_mem_thread);
 	}
+	// unregister_chrdev(major_number, DEVICE_NAME);
+	cdev_del(&c_dev);
+	device_destroy(cl, dev_num);
+	class_destroy(cl);
+	unregister_chrdev_region(dev_num, 1);
 	kfree(shared_buffer);
+	shared_buffer = NULL;
 	printk(KERN_INFO "Shared memory syscall exited\n");
 }
 int ksamplingd_init(pid_t pid, int node)
