@@ -3,8 +3,23 @@
   CALL    scripts/checksyscalls.sh
   CHK     include/generated/compile.h
   CC      mm/htmm_sampler.o
-  AR      mm/built-in.a
+mm/htmm_sampler.c: In function ‘ksamplingd’:
+mm/htmm_sampler.c:220:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  220 |         const struct cpumask *cpumask = cpumask_of_node(0);
+      |         ^~~~~
+mm/htmm_sampler.c: In function ‘kernel_thread_fn’:
+mm/htmm_sampler.c:473:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  473 |         unsigned long *address_array;
+      |         ^~~~~~~~
+At top level:
+mm/htmm_sampler.c:460:12: warning: ‘major_number’ defined but not used [-Wunused-variable]
+  460 | static int major_number;
+      |            ^~~~~~~~~~~~
+mm/htmm_sampler.c:141:13: warning: ‘pebs_enable’ defined but not used [-Wunused-function]
+  141 | static void pebs_enable(void)
+      |             ^~~~~~~~~~~
   CHK     kernel/kheaders_data.tar.xz
+  AR      mm/built-in.a
   GEN     .version
   CHK     include/generated/compile.h
   UPD     include/generated/compile.h
@@ -40,5 +55,5 @@
   LD      arch/x86/boot/setup.elf
   OBJCOPY arch/x86/boot/setup.bin
   BUILD   arch/x86/boot/bzImage
-Kernel: arch/x86/boot/bzImage is ready  (#12)
+Kernel: arch/x86/boot/bzImage is ready  (#15)
   GEN     Module.symvers

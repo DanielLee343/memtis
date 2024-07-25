@@ -470,18 +470,23 @@ static struct class *cl;
 static int kernel_thread_fn(void *data)
 {
 	printk(KERN_INFO "enter kernel_thread\n");
+	unsigned long *address_array;
+	int i;
 	while (!kthread_should_stop()) {
-		printk(KERN_INFO "buffer_size_ptr: %d\n",
-				*buffer_size_ptr);
+		printk(KERN_INFO "buffer_size_ptr: %d\n", *buffer_size_ptr);
 		if (*buffer_size_ptr > 0) {
 			if (mutex_lock_interruptible(&buffer_mutex)) {
 				return -ERESTARTSYS;
 			}
-
-			printk(KERN_INFO "Kernel received: %s\n",
-			       shared_buffer);
-			*buffer_size_ptr =
-				0; // Reset size to indicate consumption
+			address_array = (unsigned long *)shared_buffer;
+			// printk(KERN_INFO "Kernel received: %s\n",
+			//        shared_buffer);
+			printk(KERN_INFO "addr data:\n");
+			for (i = 0; i < *buffer_size_ptr; i++) {
+				printk(KERN_INFO "Address %d: 0x%lx\n", i,
+				       address_array[i]);
+			}
+			*buffer_size_ptr = 0;
 			mutex_unlock(&buffer_mutex);
 		}
 
@@ -511,12 +516,6 @@ static int device_release(struct inode *inodep, struct file *filep)
 
 static int device_mmap(struct file *filep, struct vm_area_struct *vma)
 {
-	// Remap the kernel buffer to user space
-	// if (remap_pfn_range(vma, vma->vm_start,
-	// 		    virt_to_phys(shared_buffer) >> PAGE_SHIFT,
-	// 		    BUFFER_SIZE_SHARED_MEM, vma->vm_page_prot)) {
-	// 	return -EAGAIN;
-	// }
 	unsigned long pfn = virt_to_phys(shared_buffer) >> PAGE_SHIFT;
 	size_t size = vma->vm_end - vma->vm_start;
 
@@ -572,9 +571,10 @@ int shared_mem_init(void)
 	// 	(int *)(shared_buffer + BUFFER_SIZE_SHARED_MEM - sizeof(int));
 	// *buffer_size_ptr = 0;
 	printk(KERN_INFO "changing shared buffer init\n");
-	shared_buffer =
-		(char *)__get_free_pages(GFP_KERNEL, get_order(BUFFER_SIZE));
+	shared_buffer = (char *)__get_free_pages(
+		GFP_KERNEL, get_order(BUFFER_SIZE_SHARED_MEM));
 	if (!shared_buffer) {
+		printk(KERN_ERR "Failed to init shared_buffer\n");
 		cdev_del(&c_dev);
 		device_destroy(cl, dev_num);
 		class_destroy(cl);
@@ -582,9 +582,10 @@ int shared_mem_init(void)
 		return -ENOMEM;
 	}
 
-	memset(shared_buffer, 0, BUFFER_SIZE);
-	buffer_size_ptr = (int *)(shared_buffer + BUFFER_SIZE - sizeof(int));
-
+	memset(shared_buffer, 0, BUFFER_SIZE_SHARED_MEM);
+	buffer_size_ptr =
+		(int *)(shared_buffer + BUFFER_SIZE_SHARED_MEM - sizeof(int));
+	printk(KERN_INFO "buffer_size_ptr: %d", *buffer_size_ptr);
 	mutex_init(&buffer_mutex);
 	// major_number = register_chrdev(0, DEVICE_NAME, &fops);
 	// if (major_number < 0) {
@@ -602,7 +603,10 @@ int shared_mem_init(void)
 	shared_mem_thread =
 		kthread_run(kernel_thread_fn, NULL, "shared_mem_thread");
 	if (IS_ERR(shared_mem_thread)) {
-		kfree(shared_buffer);
+		// kfree(shared_buffer);
+		free_pages((unsigned long)shared_buffer,
+			   get_order(BUFFER_SIZE_SHARED_MEM));
+		shared_buffer = NULL;
 		cdev_del(&c_dev);
 		device_destroy(cl, dev_num);
 		class_destroy(cl);
@@ -628,7 +632,9 @@ void shared_mem_exit(void)
 	device_destroy(cl, dev_num);
 	class_destroy(cl);
 	unregister_chrdev_region(dev_num, 1);
-	kfree(shared_buffer);
+	// kfree(shared_buffer);
+	free_pages((unsigned long)shared_buffer,
+		   get_order(BUFFER_SIZE_SHARED_MEM));
 	shared_buffer = NULL;
 	printk(KERN_INFO "Shared memory syscall exited\n");
 }

@@ -12,8 +12,7 @@
 #include <linux/init.h>
 
 #define DEVICE_NAME "shared_mem_device"
-#define BUFFER_SIZE                                                            \
-	4096 // Ensure this is a multiple of page size (typically 4096 bytes)
+#define BUFFER_SIZE 4096
 
 static char *shared_buffer;
 static dev_t dev_num;
@@ -60,6 +59,7 @@ static struct file_operations fops = {
 static int kernel_thread_fn(void *data)
 {
 	while (!kthread_should_stop()) {
+		printk(KERN_INFO "buffer_size: %d\n", *buffer_size);
 		if (*buffer_size > 0) {
 			if (mutex_lock_interruptible(&buffer_mutex)) {
 				return -ERESTARTSYS;
@@ -71,7 +71,7 @@ static int kernel_thread_fn(void *data)
 
 			mutex_unlock(&buffer_mutex);
 		}
-		msleep(100);
+		msleep(500);
 	}
 	return 0;
 }
