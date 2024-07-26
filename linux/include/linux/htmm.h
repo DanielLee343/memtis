@@ -135,7 +135,7 @@ extern void adjust_active_threshold(pid_t pid);
 extern void set_lru_cooling_pid(pid_t pid);
 
 /* htmm_sampler.c */
-extern int shared_mem_init(void);
+extern int shared_mem_init(pid_t pid);
 extern void shared_mem_exit(void);
 extern int ksamplingd_init(pid_t pid, int node);
 extern void ksamplingd_exit(void);

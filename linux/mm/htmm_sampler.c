@@ -469,7 +469,10 @@ static struct class *cl;
 // Kernel thread to monitor shared memory
 static int kernel_thread_fn(void *data)
 {
-	printk(KERN_INFO "enter kernel_thread\n");
+	// printk(KERN_INFO "enter kernel_thread\n");
+	pid_t pid = *(pid_t *)data;
+	enum events tmp_event = TLB_MISS_LOADS;
+	// printk(KERN_INFO "Kernel thread started with pid: %d\n", pid);
 	unsigned long *address_array;
 	int i;
 	while (!kthread_should_stop()) {
@@ -481,10 +484,17 @@ static int kernel_thread_fn(void *data)
 			address_array = (unsigned long *)shared_buffer;
 			// printk(KERN_INFO "Kernel received: %s\n",
 			//        shared_buffer);
-			printk(KERN_INFO "addr data:\n");
+			// printk(KERN_INFO "addr data:\n");
 			for (i = 0; i < *buffer_size_ptr; i++) {
-				printk(KERN_INFO "Address %d: 0x%lx\n", i,
-				       address_array[i]);
+				if (!valid_va(address_array[i])) {
+					// printk(KERN_INFO
+					//        "invalide addr: 0x%lx\n",
+					//        address_array[i]);
+					continue;
+				}
+				update_pginfo(pid, address_array[i], tmp_event);
+				// printk(KERN_INFO "sent: 0x%lx\n",
+				//        address_array[i]);
 			}
 			*buffer_size_ptr = 0;
 			mutex_unlock(&buffer_mutex);
@@ -528,8 +538,9 @@ static int device_mmap(struct file *filep, struct vm_area_struct *vma)
 	}
 	return 0;
 }
-int shared_mem_init(void)
+int shared_mem_init(pid_t pid)
 {
+	printk(KERN_INFO "pid in shared_mem: %d\n", pid);
 	if (shared_buffer) {
 		kfree(shared_buffer);
 		shared_buffer = NULL;
@@ -585,7 +596,6 @@ int shared_mem_init(void)
 	memset(shared_buffer, 0, BUFFER_SIZE_SHARED_MEM);
 	buffer_size_ptr =
 		(int *)(shared_buffer + BUFFER_SIZE_SHARED_MEM - sizeof(int));
-	printk(KERN_INFO "buffer_size_ptr: %d", *buffer_size_ptr);
 	mutex_init(&buffer_mutex);
 	// major_number = register_chrdev(0, DEVICE_NAME, &fops);
 	// if (major_number < 0) {
@@ -601,7 +611,7 @@ int shared_mem_init(void)
 
 	// Create and start the kernel thread
 	shared_mem_thread =
-		kthread_run(kernel_thread_fn, NULL, "shared_mem_thread");
+		kthread_run(kernel_thread_fn, &pid, "shared_mem_thread");
 	if (IS_ERR(shared_mem_thread)) {
 		// kfree(shared_buffer);
 		free_pages((unsigned long)shared_buffer,
@@ -642,6 +652,7 @@ int ksamplingd_init(pid_t pid, int node)
 {
 	int ret;
 	printk("htmm init!\n");
+	printk(KERN_INFO "pid in ksamplingd: %d\n", pid);
 
 	if (access_sampling)
 		return 0;

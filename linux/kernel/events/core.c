@@ -12514,9 +12514,9 @@ SYSCALL_DEFINE1(htmm_end,
 
 #else
 
-SYSCALL_DEFINE0(shared_mem_start)
+SYSCALL_DEFINE1(shared_mem_start, pid_t, pid)
 {
-	shared_mem_init();
+	shared_mem_init(pid);
     return 0;
 
 }
