@@ -136,6 +136,7 @@ extern void set_lru_cooling_pid(pid_t pid);
 
 /* htmm_sampler.c */
 extern int shared_mem_init(pid_t pid);
+extern int read_device_mem_init(void);
 extern void shared_mem_exit(void);
 extern int ksamplingd_init(pid_t pid, int node);
 extern void ksamplingd_exit(void);

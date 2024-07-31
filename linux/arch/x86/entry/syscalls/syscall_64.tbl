@@ -374,6 +374,7 @@
 450	common	htmm_end		sys_htmm_end
 451	common	shared_mem_start		sys_shared_mem_start
 452	common	shared_mem_end		sys_shared_mem_end
+453	common	read_device_memory		sys_read_device_memory
 
 #
 # Due to a historical design error, certain syscalls are numbered differently

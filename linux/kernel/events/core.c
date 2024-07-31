@@ -12518,7 +12518,11 @@ SYSCALL_DEFINE1(shared_mem_start, pid_t, pid)
 {
 	shared_mem_init(pid);
     return 0;
+}
 
+SYSCALL_DEFINE1(read_device_memory, char __user *, user_buffer) {
+    read_device_mem_init();
+    return 0;
 }
 
 SYSCALL_DEFINE0(shared_mem_end)

@@ -2,72 +2,37 @@
   CALL    scripts/atomic/check-atomics.sh
   CALL    scripts/checksyscalls.sh
   CHK     include/generated/compile.h
-  CC      kernel/fork.o
-  CC      kernel/exit.o
-  CC      mm/memory.o
-  CC      mm/rmap.o
-  CC      mm/mempolicy.o
-  CC      mm/migrate.o
-  CC      mm/huge_memory.o
-  CC      mm/khugepaged.o
-  CC      mm/memcontrol.o
   CC      mm/htmm_sampler.o
-  CC      mm/htmm_core.o
-  CC      mm/htmm_migrater.o
-  CHK     kernel/kheaders_data.tar.xz
-  CC      kernel/events/core.o
-  GEN     kernel/kheaders_data.tar.xz
-In file included from ./include/linux/kernel.h:16,
-                 from ./arch/x86/include/asm/percpu.h:27,
-                 from ./arch/x86/include/asm/current.h:6,
-                 from ./include/linux/sched.h:12,
-                 from ./include/linux/kthread.h:6,
-                 from mm/htmm_migrater.c:5:
-mm/htmm_migrater.c: In function ‘demote_lruvec’:
-./include/linux/minmax.h:20:35: warning: comparison of distinct pointer types lacks a cast
-   20 |         (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
-      |                                   ^~
-./include/linux/minmax.h:26:18: note: in expansion of macro ‘__typecheck’
-   26 |                 (__typecheck(x, y) && __no_side_effects(x, y))
-      |                  ^~~~~~~~~~~
-./include/linux/minmax.h:36:31: note: in expansion of macro ‘__safe_cmp’
-   36 |         __builtin_choose_expr(__safe_cmp(x, y), \
-      |                               ^~~~~~~~~~
-./include/linux/minmax.h:45:25: note: in expansion of macro ‘__careful_cmp’
-   45 | #define min(x, y)       __careful_cmp(x, y, <)
-      |                         ^~~~~~~~~~~~~
-mm/htmm_migrater.c:557:34: note: in expansion of macro ‘min’
-  557 |             unsigned long scan = min(nr_to_scan, SWAP_CLUSTER_MAX);
-      |                                  ^~~
 mm/htmm_sampler.c: In function ‘ksamplingd’:
-mm/htmm_sampler.c:220:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-  220 |         const struct cpumask *cpumask = cpumask_of_node(0);
-      |         ^~~~~
-mm/htmm_sampler.c: In function ‘kernel_thread_fn’:
-mm/htmm_sampler.c:473:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-  473 |         pid_t pid = *(pid_t *)data;
-      |         ^~~~~
-mm/htmm_sampler.c:476:9: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-  476 |         unsigned long *address_array;
-      |         ^~~~~~~~
-mm/htmm_core.c:657:13: warning: ‘need_cooling’ defined but not used [-Wunused-function]
-  657 | static bool need_cooling(struct mem_cgroup *memcg)
-      |             ^~~~~~~~~~~~
+mm/htmm_sampler.c:220:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  220 |  const struct cpumask *cpumask = cpumask_of_node(0);
+      |  ^~~~~
+mm/htmm_sampler.c: In function ‘read_device_mem_init’:
+mm/htmm_sampler.c:552:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  552 |  unsigned long *address_array = (unsigned long *)intercepted_addr_buffer;
+      |  ^~~~~~~~
+mm/htmm_sampler.c: In function ‘shared_mem_init’:
+mm/htmm_sampler.c:565:6: warning: unused variable ‘i’ [-Wunused-variable]
+  565 |  int i;
+      |      ^
 At top level:
+mm/htmm_sampler.c:469:22: warning: ‘cl’ defined but not used [-Wunused-variable]
+  469 | static struct class *cl;
+      |                      ^~
+mm/htmm_sampler.c:468:20: warning: ‘c_dev’ defined but not used [-Wunused-variable]
+  468 | static struct cdev c_dev;
+      |                    ^~~~~
+mm/htmm_sampler.c:467:14: warning: ‘dev_num’ defined but not used [-Wunused-variable]
+  467 | static dev_t dev_num;
+      |              ^~~~~~~
 mm/htmm_sampler.c:460:12: warning: ‘major_number’ defined but not used [-Wunused-variable]
   460 | static int major_number;
       |            ^~~~~~~~~~~~
 mm/htmm_sampler.c:141:13: warning: ‘pebs_enable’ defined but not used [-Wunused-function]
   141 | static void pebs_enable(void)
       |             ^~~~~~~~~~~
-In file included from kernel/events/core.c:59:
-./include/linux/htmm.h:113:58: warning: ‘struct mem_cgroup_per_node’ declared inside parameter list will not be visible outside of this definition or declaration
-  113 | extern unsigned long deferred_split_scan_for_htmm(struct mem_cgroup_per_node *pn,
-      |                                                          ^~~~~~~~~~~~~~~~~~~
   AR      mm/built-in.a
-  AR      kernel/events/built-in.a
-  AR      kernel/built-in.a
-  CC [M]  kernel/kheaders.o
+  CHK     kernel/kheaders_data.tar.xz
   GEN     .version
   CHK     include/generated/compile.h
   UPD     include/generated/compile.h
@@ -93,8 +58,7 @@ In file included from kernel/events/core.c:59:
   RELOCS  arch/x86/boot/compressed/vmlinux.relocs
   CC      arch/x86/boot/compressed/kaslr.o
   CC      arch/x86/boot/compressed/misc.o
-  ZSTD22  arch/x86/boot/compressed/vmlinux.bin.zst
-  GEN     Module.symvers
+  LZ4     arch/x86/boot/compressed/vmlinux.bin.lz4
   MKPIGGY arch/x86/boot/compressed/piggy.S
   AS      arch/x86/boot/compressed/piggy.o
   LD      arch/x86/boot/compressed/vmlinux
@@ -104,5 +68,5 @@ In file included from kernel/events/core.c:59:
   LD      arch/x86/boot/setup.elf
   OBJCOPY arch/x86/boot/setup.bin
   BUILD   arch/x86/boot/bzImage
-Kernel: arch/x86/boot/bzImage is ready  (#2)
-  LD [M]  kernel/kheaders.ko
+Kernel: arch/x86/boot/bzImage is ready  (#11)
+  GEN     Module.symvers

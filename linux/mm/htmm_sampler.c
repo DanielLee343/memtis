@@ -458,8 +458,10 @@ static int ksamplingd_run(void)
 #define BUFFER_SIZE_SHARED_MEM 4096
 #define DEVICE_NAME "shared_mem_dev"
 static int major_number;
-static char *shared_buffer;
-static int *buffer_size_ptr;
+char *intercepted_addr_buffer;
+int *intercepted_addr_buffer_size;
+EXPORT_SYMBOL(intercepted_addr_buffer);
+EXPORT_SYMBOL(intercepted_addr_buffer_size);
 static struct task_struct *shared_mem_thread;
 static struct mutex buffer_mutex;
 static dev_t dev_num;
@@ -476,16 +478,16 @@ static int kernel_thread_fn(void *data)
 	unsigned long *address_array;
 	int i;
 	while (!kthread_should_stop()) {
-		printk(KERN_INFO "buffer_size_ptr: %d\n", *buffer_size_ptr);
-		if (*buffer_size_ptr > 0) {
+		printk(KERN_INFO "intercepted_addr_buffer_size: %d\n", *intercepted_addr_buffer_size);
+		if (*intercepted_addr_buffer_size > 0) {
 			if (mutex_lock_interruptible(&buffer_mutex)) {
 				return -ERESTARTSYS;
 			}
-			address_array = (unsigned long *)shared_buffer;
+			address_array = (unsigned long *)intercepted_addr_buffer;
 			// printk(KERN_INFO "Kernel received: %s\n",
-			//        shared_buffer);
+			//        intercepted_addr_buffer);
 			// printk(KERN_INFO "addr data:\n");
-			for (i = 0; i < *buffer_size_ptr; i++) {
+			for (i = 0; i < *intercepted_addr_buffer_size; i++) {
 				if (!valid_va(address_array[i])) {
 					// printk(KERN_INFO
 					//        "invalide addr: 0x%lx\n",
@@ -493,10 +495,10 @@ static int kernel_thread_fn(void *data)
 					continue;
 				}
 				update_pginfo(pid, address_array[i], tmp_event);
-				// printk(KERN_INFO "sent: 0x%lx\n",
-				//        address_array[i]);
+				printk(KERN_INFO "sent: 0x%lx\n",
+				       address_array[i]);
 			}
-			*buffer_size_ptr = 0;
+			*intercepted_addr_buffer_size = 0;
 			mutex_unlock(&buffer_mutex);
 		}
 
@@ -505,147 +507,108 @@ static int kernel_thread_fn(void *data)
 	return 0;
 }
 // File operations prototypes
-static int device_open(struct inode *, struct file *);
-static int device_release(struct inode *, struct file *);
-static int device_mmap(struct file *, struct vm_area_struct *);
-static struct file_operations fops = {
-	.open = device_open,
-	.release = device_release,
-	.mmap = device_mmap,
-};
+// static int device_open(struct inode *, struct file *);
+// static int device_release(struct inode *, struct file *);
+// static int device_mmap(struct file *, struct vm_area_struct *);
+// static struct file_operations fops = {
+// 	.open = device_open,
+// 	.release = device_release,
+// 	.mmap = device_mmap,
+// };
 
-static int device_open(struct inode *inodep, struct file *filep)
+// static int device_open(struct inode *inodep, struct file *filep)
+// {
+// 	return 0;
+// }
+
+// static int device_release(struct inode *inodep, struct file *filep)
+// {
+// 	return 0;
+// }
+
+// static int device_mmap(struct file *filep, struct vm_area_struct *vma)
+// {
+// 	unsigned long pfn = virt_to_phys(shared_buffer) >> PAGE_SHIFT;
+// 	size_t size = vma->vm_end - vma->vm_start;
+
+// 	if (size > BUFFER_SIZE_SHARED_MEM) {
+// 		return -EINVAL;
+// 	}
+
+// 	if (remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot)) {
+// 		return -EAGAIN;
+// 	}
+// 	return 0;
+// }
+
+int read_device_mem_init(void)
 {
-	return 0;
-}
-
-static int device_release(struct inode *inodep, struct file *filep)
-{
-	return 0;
-}
-
-static int device_mmap(struct file *filep, struct vm_area_struct *vma)
-{
-	unsigned long pfn = virt_to_phys(shared_buffer) >> PAGE_SHIFT;
-	size_t size = vma->vm_end - vma->vm_start;
-
-	if (size > BUFFER_SIZE_SHARED_MEM) {
+	size_t i;
+	if (!intercepted_addr_buffer) {
+		printk(KERN_WARNING "Device buffer not found\n");
 		return -EINVAL;
 	}
-
-	if (remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot)) {
-		return -EAGAIN;
+	printk(KERN_INFO "buffer address: %p\n", intercepted_addr_buffer);
+	unsigned long *address_array = (unsigned long *)intercepted_addr_buffer;
+	for (i = 0; i < 10; i++) {
+		// if (!valid_va(address_array[i])) {
+		// 	continue;
+		// }
+		// update_pginfo(pid, address_array[i], tmp_event);
+		printk(KERN_INFO "kernel get: 0x%lx\n", address_array[i]);
 	}
 	return 0;
+	// }
 }
 int shared_mem_init(pid_t pid)
 {
+	int i;
 	printk(KERN_INFO "pid in shared_mem: %d\n", pid);
-	if (shared_buffer) {
-		kfree(shared_buffer);
-		shared_buffer = NULL;
-	}
-	printk(KERN_INFO "creating device char\n");
-	if (alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME) < 0) {
-		return -1;
-	}
-
-	if ((cl = class_create(THIS_MODULE, DEVICE_NAME)) == NULL) {
-		unregister_chrdev_region(dev_num, 1);
-		return -1;
-	}
-
-	if (device_create(cl, NULL, dev_num, NULL, DEVICE_NAME) == NULL) {
-		class_destroy(cl);
-		unregister_chrdev_region(dev_num, 1);
-		return -1;
-	}
-
-	cdev_init(&c_dev, &fops);
-
-	if (cdev_add(&c_dev, dev_num, 1) == -1) {
-		device_destroy(cl, dev_num);
-		class_destroy(cl);
-		unregister_chrdev_region(dev_num, 1);
-		return -1;
-	}
+	// if (!intercepted_addr_buffer) {
+	// 	printk(KERN_WARNING "intercepted_addr_buffer not found\n");
+	// 	return -EINVAL;
+	// }
+	// shared_buffer = (char *)__get_free_pages(
+	// 	GFP_KERNEL, get_order(BUFFER_SIZE_SHARED_MEM));
 	// if (!shared_buffer) {
-
-	// Allocate a shared memory buffer
-	// shared_buffer = kmalloc(BUFFER_SIZE_SHARED_MEM, GFP_KERNEL);
-	// if (!shared_buffer) {
-	// 	printk(KERN_ERR "Failed to allocate shared memory\n");
+	// 	printk(KERN_ERR "Failed to init shared_buffer\n");
+	// 	cdev_del(&c_dev);
+	// 	device_destroy(cl, dev_num);
+	// 	class_destroy(cl);
+	// 	unregister_chrdev_region(dev_num, 1);
 	// 	return -ENOMEM;
 	// }
-
+	// memset(shared_buffer, 0, BUFFER_SIZE_SHARED_MEM);
+	// memset(intercepted_addr_buffer, 0, BUFFER_SIZE_SHARED_MEM);
 	// buffer_size_ptr =
-	// 	(int *)(shared_buffer + BUFFER_SIZE_SHARED_MEM - sizeof(int));
-	// *buffer_size_ptr = 0;
-	printk(KERN_INFO "changing shared buffer init\n");
-	shared_buffer = (char *)__get_free_pages(
-		GFP_KERNEL, get_order(BUFFER_SIZE_SHARED_MEM));
-	if (!shared_buffer) {
-		printk(KERN_ERR "Failed to init shared_buffer\n");
-		cdev_del(&c_dev);
-		device_destroy(cl, dev_num);
-		class_destroy(cl);
-		unregister_chrdev_region(dev_num, 1);
-		return -ENOMEM;
-	}
-
-	memset(shared_buffer, 0, BUFFER_SIZE_SHARED_MEM);
-	buffer_size_ptr =
-		(int *)(shared_buffer + BUFFER_SIZE_SHARED_MEM - sizeof(int));
+	// 	(int *)(intercepted_addr_buffer + BUFFER_SIZE_SHARED_MEM - sizeof(int));
 	mutex_init(&buffer_mutex);
-	// major_number = register_chrdev(0, DEVICE_NAME, &fops);
-	// if (major_number < 0) {
-	// 	kfree(shared_buffer);
-	// 	printk(KERN_ERR
-	// 	       "Failed to register character device\n");
-	// 	return major_number;
-	// }
 
-	// printk(KERN_INFO
-	//        "Shared memory device registered, major number: %d\n",
-	//        major_number);
-
-	// Create and start the kernel thread
 	shared_mem_thread =
 		kthread_run(kernel_thread_fn, &pid, "shared_mem_thread");
 	if (IS_ERR(shared_mem_thread)) {
-		// kfree(shared_buffer);
-		free_pages((unsigned long)shared_buffer,
-			   get_order(BUFFER_SIZE_SHARED_MEM));
-		shared_buffer = NULL;
-		cdev_del(&c_dev);
-		device_destroy(cl, dev_num);
-		class_destroy(cl);
-		unregister_chrdev_region(dev_num, 1);
+		// 	// free_pages((unsigned long)shared_buffer,
+		// 	// 	   get_order(BUFFER_SIZE_SHARED_MEM));
+		// kfree(intercepted_addr_buffer);
+		// 	intercepted_addr_buffer = NULL;
 		printk(KERN_ERR "Failed to create kernel thread\n");
 		return PTR_ERR(shared_mem_thread);
 	}
-	// }
-
-	// Return the physical address of the shared buffer
-	// return virt_to_phys(shared_buffer);
 	return 0;
 }
 void shared_mem_exit(void)
 {
+	kthread_stop(shared_mem_thread);
 	printk(KERN_INFO "enter shared mem exit\n");
-	if (shared_mem_thread) {
-		printk(KERN_INFO "shared_mem not NULL, make it stop\n");
-		kthread_stop(shared_mem_thread);
-	}
 	// unregister_chrdev(major_number, DEVICE_NAME);
-	cdev_del(&c_dev);
-	device_destroy(cl, dev_num);
-	class_destroy(cl);
-	unregister_chrdev_region(dev_num, 1);
-	// kfree(shared_buffer);
-	free_pages((unsigned long)shared_buffer,
-		   get_order(BUFFER_SIZE_SHARED_MEM));
-	shared_buffer = NULL;
+	// cdev_del(&c_dev);
+	// device_destroy(cl, dev_num);
+	// class_destroy(cl);
+	// unregister_chrdev_region(dev_num, 1);
+	// kfree(intercepted_addr_buffer);
+	// free_pages((unsigned long)shared_buffer,
+	// 	   get_order(BUFFER_SIZE_SHARED_MEM));
+	// intercepted_addr_buffer = NULL;
 	printk(KERN_INFO "Shared memory syscall exited\n");
 }
 int ksamplingd_init(pid_t pid, int node)

@@ -947,8 +947,9 @@ asmlinkage long sys_perf_event_open(
 /* CONFIG_HTMM */
 asmlinkage long sys_htmm_start(pid_t pid, int node);
 asmlinkage long sys_htmm_end(pid_t pid);
-asmlinkage long sys_shared_mem_start();
+asmlinkage long sys_shared_mem_start(pid_t pid);
 asmlinkage long sys_shared_mem_end();
+asmlinkage long sys_read_device_memory(char __user *user_buffer);
 /***************/
 asmlinkage long sys_accept4(int, struct sockaddr __user *, int __user *, int);
 asmlinkage long sys_recvmmsg(int fd, struct mmsghdr __user *msg,
