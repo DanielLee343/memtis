@@ -1,3 +1,4 @@
+  SYNC    include/config/auto.conf.cmd
   DESCEND objtool
   CALL    scripts/atomic/check-atomics.sh
   CALL    scripts/checksyscalls.sh
@@ -8,25 +9,21 @@ mm/htmm_sampler.c:220:2: warning: ISO C90 forbids mixed declarations and code [-
   220 |  const struct cpumask *cpumask = cpumask_of_node(0);
       |  ^~~~~
 mm/htmm_sampler.c: In function ‘read_device_mem_init’:
-mm/htmm_sampler.c:552:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-  552 |  unsigned long *address_array = (unsigned long *)intercepted_addr_buffer;
+mm/htmm_sampler.c:517:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  517 |  unsigned long *address_array = (unsigned long *)intercepted_addr_buffer;
       |  ^~~~~~~~
-mm/htmm_sampler.c: In function ‘shared_mem_init’:
-mm/htmm_sampler.c:565:6: warning: unused variable ‘i’ [-Wunused-variable]
-  565 |  int i;
-      |      ^
 At top level:
-mm/htmm_sampler.c:469:22: warning: ‘cl’ defined but not used [-Wunused-variable]
-  469 | static struct class *cl;
+mm/htmm_sampler.c:470:22: warning: ‘cl’ defined but not used [-Wunused-variable]
+  470 | static struct class *cl;
       |                      ^~
-mm/htmm_sampler.c:468:20: warning: ‘c_dev’ defined but not used [-Wunused-variable]
-  468 | static struct cdev c_dev;
+mm/htmm_sampler.c:469:20: warning: ‘c_dev’ defined but not used [-Wunused-variable]
+  469 | static struct cdev c_dev;
       |                    ^~~~~
-mm/htmm_sampler.c:467:14: warning: ‘dev_num’ defined but not used [-Wunused-variable]
-  467 | static dev_t dev_num;
+mm/htmm_sampler.c:468:14: warning: ‘dev_num’ defined but not used [-Wunused-variable]
+  468 | static dev_t dev_num;
       |              ^~~~~~~
-mm/htmm_sampler.c:460:12: warning: ‘major_number’ defined but not used [-Wunused-variable]
-  460 | static int major_number;
+mm/htmm_sampler.c:461:12: warning: ‘major_number’ defined but not used [-Wunused-variable]
+  461 | static int major_number;
       |            ^~~~~~~~~~~~
 mm/htmm_sampler.c:141:13: warning: ‘pebs_enable’ defined but not used [-Wunused-function]
   141 | static void pebs_enable(void)
@@ -68,5 +65,5 @@ mm/htmm_sampler.c:141:13: warning: ‘pebs_enable’ defined but not used [-Wunu
   LD      arch/x86/boot/setup.elf
   OBJCOPY arch/x86/boot/setup.bin
   BUILD   arch/x86/boot/bzImage
-Kernel: arch/x86/boot/bzImage is ready  (#11)
+Kernel: arch/x86/boot/bzImage is ready  (#12)
   GEN     Module.symvers
