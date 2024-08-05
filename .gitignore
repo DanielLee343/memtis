@@ -1,3 +1,7 @@
 *.log
 *.o
 .vscode
+
+memtis-userspace/bench_dir/
+memtis-userspace/bin/
+memtis-userspace/results/

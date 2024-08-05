@@ -3,36 +3,11 @@
   CALL    scripts/checksyscalls.sh
   CHK     include/generated/compile.h
   CC      mm/memcontrol.o
-  CC      lib/string.o
   CHK     kernel/kheaders_data.tar.xz
 mm/memcontrol.c: In function ‘memcg_htmm_write’:
 mm/memcontrol.c:7590:5: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
  7590 |     struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
       |     ^~~~~~
-  CC      mm/htmm_migrater.o
-  AR      lib/lib.a
-In file included from ./include/linux/kernel.h:16,
-                 from ./arch/x86/include/asm/percpu.h:27,
-                 from ./arch/x86/include/asm/current.h:6,
-                 from ./include/linux/sched.h:12,
-                 from ./include/linux/kthread.h:6,
-                 from mm/htmm_migrater.c:5:
-mm/htmm_migrater.c: In function ‘demote_lruvec’:
-./include/linux/minmax.h:20:28: warning: comparison of distinct pointer types lacks a cast
-   20 |  (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
-      |                            ^~
-./include/linux/minmax.h:26:4: note: in expansion of macro ‘__typecheck’
-   26 |   (__typecheck(x, y) && __no_side_effects(x, y))
-      |    ^~~~~~~~~~~
-./include/linux/minmax.h:36:24: note: in expansion of macro ‘__safe_cmp’
-   36 |  __builtin_choose_expr(__safe_cmp(x, y), \
-      |                        ^~~~~~~~~~
-./include/linux/minmax.h:45:19: note: in expansion of macro ‘__careful_cmp’
-   45 | #define min(x, y) __careful_cmp(x, y, <)
-      |                   ^~~~~~~~~~~~~
-mm/htmm_migrater.c:578:25: note: in expansion of macro ‘min’
-  578 |    unsigned long scan = min(nr_to_scan, SWAP_CLUSTER_MAX);
-      |                         ^~~
   AR      mm/built-in.a
   GEN     .version
   CHK     include/generated/compile.h
@@ -69,5 +44,5 @@ mm/htmm_migrater.c:578:25: note: in expansion of macro ‘min’
   LD      arch/x86/boot/setup.elf
   OBJCOPY arch/x86/boot/setup.bin
   BUILD   arch/x86/boot/bzImage
-Kernel: arch/x86/boot/bzImage is ready  (#8)
+Kernel: arch/x86/boot/bzImage is ready  (#9)
   GEN     Module.symvers

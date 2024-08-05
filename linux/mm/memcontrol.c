@@ -7629,6 +7629,7 @@ static struct cftype memcg_htmm_file[] = {
 
 static int __init mem_cgroup_htmm_init(void)
 {
+	printk(KERN_INFO "mem_cgroup_htmm_init called\n");
     WARN_ON(cgroup_add_dfl_cftypes(&memory_cgrp_subsys,
 		memcg_htmm_file));
     return 0;
@@ -7768,6 +7769,7 @@ static ssize_t memcg_per_node_max_write(struct kernfs_open_file *of,
 
 static int pgdat_memcg_htmm_init(struct pglist_data *pgdat)
 {
+	printk(KERN_INFO "pgdat_memcg_htmm_init called\n");
     pgdat->memcg_htmm_file = kzalloc(sizeof(struct cftype) * 2, GFP_KERNEL);
     if (!pgdat->memcg_htmm_file) {
 	printk("error: fails to allocate pgdat->memcg_htmm_file\n");
