@@ -1,35 +1,39 @@
-  SYNC    include/config/auto.conf.cmd
   DESCEND objtool
   CALL    scripts/atomic/check-atomics.sh
   CALL    scripts/checksyscalls.sh
   CHK     include/generated/compile.h
-  CC      mm/htmm_sampler.o
-mm/htmm_sampler.c: In function ‘ksamplingd’:
-mm/htmm_sampler.c:220:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-  220 |  const struct cpumask *cpumask = cpumask_of_node(0);
-      |  ^~~~~
-mm/htmm_sampler.c: In function ‘read_device_mem_init’:
-mm/htmm_sampler.c:517:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-  517 |  unsigned long *address_array = (unsigned long *)intercepted_addr_buffer;
-      |  ^~~~~~~~
-At top level:
-mm/htmm_sampler.c:470:22: warning: ‘cl’ defined but not used [-Wunused-variable]
-  470 | static struct class *cl;
-      |                      ^~
-mm/htmm_sampler.c:469:20: warning: ‘c_dev’ defined but not used [-Wunused-variable]
-  469 | static struct cdev c_dev;
-      |                    ^~~~~
-mm/htmm_sampler.c:468:14: warning: ‘dev_num’ defined but not used [-Wunused-variable]
-  468 | static dev_t dev_num;
-      |              ^~~~~~~
-mm/htmm_sampler.c:461:12: warning: ‘major_number’ defined but not used [-Wunused-variable]
-  461 | static int major_number;
-      |            ^~~~~~~~~~~~
-mm/htmm_sampler.c:141:13: warning: ‘pebs_enable’ defined but not used [-Wunused-function]
-  141 | static void pebs_enable(void)
-      |             ^~~~~~~~~~~
-  AR      mm/built-in.a
+  CC      mm/memcontrol.o
+  CC      lib/string.o
   CHK     kernel/kheaders_data.tar.xz
+mm/memcontrol.c: In function ‘memcg_htmm_write’:
+mm/memcontrol.c:7590:5: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+ 7590 |     struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
+      |     ^~~~~~
+  CC      mm/htmm_migrater.o
+  AR      lib/lib.a
+In file included from ./include/linux/kernel.h:16,
+                 from ./arch/x86/include/asm/percpu.h:27,
+                 from ./arch/x86/include/asm/current.h:6,
+                 from ./include/linux/sched.h:12,
+                 from ./include/linux/kthread.h:6,
+                 from mm/htmm_migrater.c:5:
+mm/htmm_migrater.c: In function ‘demote_lruvec’:
+./include/linux/minmax.h:20:28: warning: comparison of distinct pointer types lacks a cast
+   20 |  (!!(sizeof((typeof(x) *)1 == (typeof(y) *)1)))
+      |                            ^~
+./include/linux/minmax.h:26:4: note: in expansion of macro ‘__typecheck’
+   26 |   (__typecheck(x, y) && __no_side_effects(x, y))
+      |    ^~~~~~~~~~~
+./include/linux/minmax.h:36:24: note: in expansion of macro ‘__safe_cmp’
+   36 |  __builtin_choose_expr(__safe_cmp(x, y), \
+      |                        ^~~~~~~~~~
+./include/linux/minmax.h:45:19: note: in expansion of macro ‘__careful_cmp’
+   45 | #define min(x, y) __careful_cmp(x, y, <)
+      |                   ^~~~~~~~~~~~~
+mm/htmm_migrater.c:578:25: note: in expansion of macro ‘min’
+  578 |    unsigned long scan = min(nr_to_scan, SWAP_CLUSTER_MAX);
+      |                         ^~~
+  AR      mm/built-in.a
   GEN     .version
   CHK     include/generated/compile.h
   UPD     include/generated/compile.h
@@ -65,5 +69,5 @@ mm/htmm_sampler.c:141:13: warning: ‘pebs_enable’ defined but not used [-Wunu
   LD      arch/x86/boot/setup.elf
   OBJCOPY arch/x86/boot/setup.bin
   BUILD   arch/x86/boot/bzImage
-Kernel: arch/x86/boot/bzImage is ready  (#12)
+Kernel: arch/x86/boot/bzImage is ready  (#8)
   GEN     Module.symvers

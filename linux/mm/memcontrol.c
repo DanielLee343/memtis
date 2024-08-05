@@ -7586,6 +7586,7 @@ static int memcg_htmm_show(struct seq_file *m, void *v)
 static ssize_t memcg_htmm_write(struct kernfs_open_file *of,
 	char *buf, size_t nbytes, loff_t off)
 {
+	printk(KERN_INFO "memcg_htmm_write called\n");
     struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
     int nid;
 

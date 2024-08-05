@@ -455,14 +455,15 @@ static int ksamplingd_run(void)
 #include <linux/delay.h>
 #include <linux/cdev.h>
 #include <linux/io.h>
-#define BUFFER_SIZE_SHARED_MEM 4096
-#define NUM_SLOTS (BUFFER_SIZE_SHARED_MEM / 8)
-#define DEVICE_NAME "shared_mem_dev"
 static int major_number;
 char *intercepted_addr_buffer;
-int *intercepted_addr_buffer_size;
+int *intercepted_addr_buffer_idx;
+unsigned long intercepted_addr_buffer_capacity;
+bool *buffer_is_ready;
 EXPORT_SYMBOL(intercepted_addr_buffer);
-EXPORT_SYMBOL(intercepted_addr_buffer_size);
+EXPORT_SYMBOL(intercepted_addr_buffer_idx);
+EXPORT_SYMBOL(intercepted_addr_buffer_capacity);
+EXPORT_SYMBOL(buffer_is_ready);
 static struct task_struct *shared_mem_thread;
 static struct mutex buffer_mutex;
 static dev_t dev_num;
@@ -471,14 +472,16 @@ static struct class *cl;
 
 static int kernel_thread_fn(void *data)
 {
+	printk(KERN_INFO "capacity: %ld\n", intercepted_addr_buffer_capacity);
 	pid_t pid = *(pid_t *)data;
+	int num_slots = intercepted_addr_buffer_capacity / 8;
 	enum events tmp_event = TLB_MISS_LOADS;
 	unsigned long *address_array;
 	int i;
 	while (!kthread_should_stop()) {
-		printk(KERN_INFO "intercepted_addr_buffer_size: %d\n",
-		       *intercepted_addr_buffer_size);
-		if (*intercepted_addr_buffer_size >= NUM_SLOTS) {
+		// if (*intercepted_addr_buffer_idx >= num_slots) {
+		// printk(KERN_INFO "buffer_is_ready: %d\n", *buffer_is_ready);
+		if (*buffer_is_ready) {
 			if (mutex_lock_interruptible(&buffer_mutex)) {
 				return -ERESTARTSYS;
 			}
@@ -486,7 +489,7 @@ static int kernel_thread_fn(void *data)
 				(unsigned long *)intercepted_addr_buffer;
 			// printk(KERN_INFO "Kernel received: %s\n",
 			//        intercepted_addr_buffer);
-			for (i = 0; i < *intercepted_addr_buffer_size; i++) {
+			for (i = 0; i < num_slots; i++) {
 				if (!valid_va(address_array[i])) {
 					// printk(KERN_INFO
 					//        "invalide addr: 0x%lx\n",
@@ -494,14 +497,14 @@ static int kernel_thread_fn(void *data)
 					continue;
 				}
 				update_pginfo(pid, address_array[i], tmp_event);
-				printk(KERN_INFO "sent: 0x%lx\n",
-				       address_array[i]);
+				// printk(KERN_INFO "sent: 0x%lx\n",
+				//        address_array[i]);
 			}
-			*intercepted_addr_buffer_size = 0;
+			*buffer_is_ready = false;
 			mutex_unlock(&buffer_mutex);
 		}
 
-		msleep(50);
+		msleep(10);
 	}
 	return 0;
 }
@@ -565,16 +568,6 @@ void shared_mem_exit(void)
 	kthread_stop(shared_mem_thread);
 	mutex_destroy(&buffer_mutex);
 	printk(KERN_INFO "enter shared mem exit\n");
-	// unregister_chrdev(major_number, DEVICE_NAME);
-	// cdev_del(&c_dev);
-	// device_destroy(cl, dev_num);
-	// class_destroy(cl);
-	// unregister_chrdev_region(dev_num, 1);
-	// kfree(intercepted_addr_buffer);
-	// free_pages((unsigned long)shared_buffer,
-	// 	   get_order(BUFFER_SIZE_SHARED_MEM));
-	// intercepted_addr_buffer = NULL;
-	printk(KERN_INFO "Shared memory syscall exited\n");
 }
 int ksamplingd_init(pid_t pid, int node)
 {
