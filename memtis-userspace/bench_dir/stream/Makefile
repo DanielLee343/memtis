@@ -1,32 +1,35 @@
-# Define the compiler
-CC = gcc
-
-# Define the compiler flags
+# Define the compiler and flags
+CC = clang
 CFLAGS = -O2 -fopenmp -DSTREAM_ARRAY_SIZE=2000000000 -DOFFSET=56
+#  -fopenmp -DSTREAM_ARRAY_SIZE=2000000000 -DOFFSET=56
 
-# Define the target executable
-TARGET = stream
+# Define the source files and object files
+STREAM_SRC = stream.c
+STREAM_OBJ = stream.o
 
-# Define the source files
-SRCS = stream.c
+STREAM_INSTRU_SRC = stream_instru.c
+STREAM_INSTRU_OBJ = stream_instru.o
+STREAM_INSTRU_PASS = /mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so
+STREAM_INSTRU_LIB = -lrtlib -L/mnt/newdrive/compiler_assisted
 
-# Define the object files (derived from the source files)
-OBJS = $(SRCS:.c=.o)
+# Default target
+all: stream stream_instru
 
-# The default target that builds the executable
-all: $(TARGET)
+# Target to generate the stream executable
+stream: $(STREAM_OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
 
-# Rule to build the executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
-
-# Rule to build the object files
-%.o: %.c
+# Target to compile stream.o
+$(STREAM_OBJ): $(STREAM_SRC)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Clean up build files
-clean:
-	rm -f $(TARGET) $(OBJS)
+# Target to generate the stream_instru executable
+stream_instru: $(STREAM_INSTRU_SRC)
+	$(CC) -fpass-plugin=$(STREAM_INSTRU_PASS) $< $(STREAM_INSTRU_LIB) $(CFLAGS) -o $@
 
-# Phony targets
+# Phony targets to avoid conflicts with files of the same name
 .PHONY: all clean
+
+# Target to clean up the generated files
+clean:
+	rm -f stream stream_instru $(STREAM_OBJ)

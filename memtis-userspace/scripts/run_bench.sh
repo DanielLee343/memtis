@@ -16,6 +16,7 @@ CONFIG_PERF=off
 CONFIG_NS=off
 CONFIG_NW=off
 CONFIG_CXL_MODE=off
+LLVM_INSTRUMENT_MODE=off
 STATIC_DRAM=""
 DATE=""
 VER=""
@@ -86,10 +87,19 @@ function func_prepare() {
     fi
     
     if [[ -e ${DIR}/bench_cmds/${BENCH_NAME}.sh ]]; then
-        source ${DIR}/bench_cmds/${BENCH_NAME}.sh
+        if [[ "x${LLVM_INSTRUMENT_MODE}" == "xon" ]]; then
+            source ${DIR}/bench_cmds/${BENCH_NAME}.sh instru
+            echo "benchmarking LLVM instrumented prog"
+        else
+            source ${DIR}/bench_cmds/${BENCH_NAME}.sh
+            echo "benchmarking normal prog"
+        fi
     else
         echo "ERROR: ${BENCH_NAME}.sh does not exist."
         exit -1
+    fi
+    if [[ "x${LLVM_INSTRUMENT_MODE}" == "xon" ]]; then
+        export LD_LIBRARY_PATH=/mnt/newdrive/compiler_assisted
     fi
 }
 MEM_FP_FILE=fp_raw.csv
@@ -118,8 +128,11 @@ function func_main() {
     
     # set memcg for htmm
     sudo ${DIR}/scripts/set_htmm_memcg.sh htmm remove
+    echo "htmm cgroup removed"
     sudo ${DIR}/scripts/set_htmm_memcg.sh htmm $$ enable
+    echo "htmm enabled"
     sudo ${DIR}/scripts/set_mem_size.sh htmm 0 ${BENCH_DRAM}
+    echo "set size"
     sleep 2
     
     # check dram size
@@ -146,9 +159,15 @@ function func_main() {
         ${PINNING} ${DIR}/bin/launch_bench_nopid ${BENCH_RUN} < ${BENCH_ARG} 2>&1 \
         | sudo tee ${LOG_DIR}/output.log
     else
-        ${TIME} -f "execution time %e (s)" \
-        ${PINNING} ${DIR}/bin/launch_bench ${BENCH_RUN} 2>&1 \
-        | sudo tee ${LOG_DIR}/output.log
+        if [[ "x${LLVM_INSTRUMENT_MODE}" == "xon" ]]; then
+            ${TIME} -f "execution time %e (s)" \
+            ${PINNING} ${BENCH_RUN} 2>&1 \
+            | sudo tee ${LOG_DIR}/output.log
+        else
+            ${TIME} -f "execution time %e (s)" \
+            ${PINNING} ${DIR}/bin/launch_bench ${BENCH_RUN} 2>&1 \
+            | sudo tee ${LOG_DIR}/output.log
+        fi
     fi
     
     sudo killall -9 memory_stat.sh
@@ -250,6 +269,10 @@ while (( "$#" )); do
         ;;
         --cxl)
             CONFIG_CXL_MODE=on
+            shift 1
+        ;;
+        --instru)
+            LLVM_INSTRUMENT_MODE=on
             shift 1
         ;;
         -H|-?|-h|--help|--usage)

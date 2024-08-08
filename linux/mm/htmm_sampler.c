@@ -445,16 +445,15 @@ static int ksamplingd_run(void)
 	}
 	return err;
 }
-#include <linux/kernel.h>
-#include <linux/syscalls.h>
+// #include <linux/kernel.h>
+// #include <linux/syscalls.h>
 #include <linux/mm.h>
-#include <linux/slab.h>
+// #include <linux/slab.h>
 #include <linux/uaccess.h>
 #include <linux/mutex.h>
-#include <linux/kthread.h>
-#include <linux/delay.h>
-#include <linux/cdev.h>
-#include <linux/io.h>
+// #include <linux/delay.h>
+// #include <linux/cdev.h>
+// #include <linux/io.h>
 static int major_number;
 char *intercepted_addr_buffer;
 int *intercepted_addr_buffer_idx;
@@ -466,9 +465,9 @@ EXPORT_SYMBOL(intercepted_addr_buffer_capacity);
 EXPORT_SYMBOL(buffer_is_ready);
 static struct task_struct *shared_mem_thread;
 static struct mutex buffer_mutex;
-static dev_t dev_num;
-static struct cdev c_dev;
-static struct class *cl;
+// static dev_t dev_num;
+// static struct cdev c_dev;
+// static struct class *cl;
 
 static int kernel_thread_fn(void *data)
 {
