@@ -1,7 +1,11 @@
 #!/bin/bash
 
 BIN=/mnt/newdrive/memtis/memtis-userspace/bench_dir/graph500/omp-csr
-BENCH_RUN="${BIN}/omp-csr -s 24 -e 15"
+if [[ -z "$1" ]]; then
+    BENCH_RUN="${BIN}/omp-csr -s 24 -e 15"
+else
+    BENCH_RUN="${BIN}/omp-csr_instru -s 24 -e 15"
+fi
 BENCH_DRAM=""
 # -s 24: 8453 MB
 

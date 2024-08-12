@@ -16,6 +16,7 @@ CONFIG_PERF=off
 CONFIG_NS=off
 CONFIG_NW=off
 CONFIG_CXL_MODE=off
+LLVM_INSTRUMENT_MODE=off
 STATIC_DRAM=""
 DATE=""
 VER=""
@@ -66,104 +67,123 @@ function func_memtis_setting() {
 
 function func_prepare() {
     echo "Preparing benchmark start..."
-
-	sudo sysctl kernel.perf_event_max_sample_rate=100000
-
-	# disable automatic numa balancing
-	sudo echo 0 > /proc/sys/kernel/numa_balancing
-	# set configs
-	func_memtis_setting
-	
-	DATE=$(date +%Y%m%d%H%M)
-
-	export BENCH_NAME
-	export NVM_RATIO
-
-	if [[ "x${NVM_RATIO}" == "xstatic" ]]; then
-	    if [[ "x${STATIC_DRAM}" != "x" ]]; then
-		export STATIC_DRAM
-	    fi
-	fi
-
-	if [[ -e ${DIR}/bench_cmds/${BENCH_NAME}.sh ]]; then
-	    source ${DIR}/bench_cmds/${BENCH_NAME}.sh
-	else
-	    echo "ERROR: ${BENCH_NAME}.sh does not exist."
-	    exit -1
-	fi
+    
+    sudo sysctl kernel.perf_event_max_sample_rate=100000
+    
+    # disable automatic numa balancing
+    sudo echo 0 > /proc/sys/kernel/numa_balancing
+    # set configs
+    func_memtis_setting
+    
+    DATE=$(date +%Y%m%d%H%M)
+    
+    export BENCH_NAME
+    export NVM_RATIO
+    
+    if [[ "x${NVM_RATIO}" == "xstatic" ]]; then
+        if [[ "x${STATIC_DRAM}" != "x" ]]; then
+            export STATIC_DRAM
+        fi
+    fi
+    
+    if [[ -e ${DIR}/bench_cmds/${BENCH_NAME}.sh ]]; then
+        if [[ "x${LLVM_INSTRUMENT_MODE}" == "xon" ]]; then
+            source ${DIR}/bench_cmds/${BENCH_NAME}.sh instru
+            echo "benchmarking LLVM instrumented prog"
+        else
+            source ${DIR}/bench_cmds/${BENCH_NAME}.sh
+            echo "benchmarking normal prog"
+        fi
+    else
+        echo "ERROR: ${BENCH_NAME}.sh does not exist."
+        exit -1
+    fi
+    if [[ "x${LLVM_INSTRUMENT_MODE}" == "xon" ]]; then
+        export LD_LIBRARY_PATH=/mnt/newdrive/compiler_assisted
+    fi
 }
 MEM_FP_FILE=fp_raw.csv
+
 function func_main() {
     ${DIR}/bin/kill_ksampled
     TIME="/usr/bin/time"
-
+    
     if [[ "x${CONFIG_PERF}" == "xon" ]]; then
-	PERF="./perf stat -e dtlb_store_misses.walk_pending,dtlb_load_misses.walk_pending,dTLB-store-misses,cycle_activity.stalls_total"
+        PERF="./perf stat -e dtlb_store_misses.walk_pending,dtlb_load_misses.walk_pending,dTLB-store-misses,cycle_activity.stalls_total"
     else
-	PERF=""
+        PERF=""
     fi
     
-    # use 20 threads 
-    PINNING="taskset -c 0-9,20-29"
-
+    # use 20 threads
+    PINNING="taskset -c 0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46"
+    
     echo "-----------------------"
     echo "NVM RATIO: ${NVM_RATIO}"
     echo "${DATE}"
     echo "-----------------------"
-
+    
     # make directory for results
     mkdir -p ${DIR}/results/${BENCH_NAME}/${VER}/${NVM_RATIO}
     LOG_DIR=${DIR}/results/${BENCH_NAME}/${VER}/${NVM_RATIO}
-
+    
     # set memcg for htmm
     sudo ${DIR}/scripts/set_htmm_memcg.sh htmm remove
+    echo "htmm cgroup removed"
     sudo ${DIR}/scripts/set_htmm_memcg.sh htmm $$ enable
+    echo "htmm enabled"
     sudo ${DIR}/scripts/set_mem_size.sh htmm 0 ${BENCH_DRAM}
+    echo "set size"
     sleep 2
-
+    
     # check dram size
     MAX_DRAM_SIZE=$(numastat -m | awk '$1 == "MemFree" { print int($2) }')
     if [[ ${BENCH_DRAM::-2} -gt ${MAX_DRAM_SIZE} ]]; then
-	echo "Available DRAM size for ${BENCH_NAME} is only ${MAX_DRAM_SIZE}MB"
-	echo "ERROR: abort -- change the ratio"
-	exit -1
+        echo "Available DRAM size for ${BENCH_NAME} is only ${MAX_DRAM_SIZE}MB"
+        echo "ERROR: abort -- change the ratio"
+        exit -1
     fi
-
-    cat /proc/vmstat | grep -e thp -e htmm -e pgmig > ${LOG_DIR}/before_vmstat.log 
+    
+    cat /proc/vmstat | grep -e thp -e htmm -e pgmig > ${LOG_DIR}/before_vmstat.log
     # flush cache
     func_cache_flush
-	rm -rf ${LOG_DIR}/$MEM_FP_FILE
+    rm -rf ${LOG_DIR}/$MEM_FP_FILE
     sleep 2
-
+    
     ${DIR}/scripts/memory_stat.sh ${LOG_DIR} &
     if [[ "x${BENCH_NAME}" =~ "xsilo" ]]; then
-	${TIME} -f "execution time %e (s)" \
-	    ${PINNING} ${DIR}/bin/launch_bench_nopid ${BENCH_RUN} 2>&1 \
-	    | tee ${LOG_DIR}/output.log
-    elif [[ "x${BENCH_NAME}" =~ "xspeccpu" ]]; then
-	${TIME} -f "execution time %e (s)" \
-	    ${PINNING} ${DIR}/bin/launch_bench_nopid ${BENCH_RUN} < ${BENCH_ARG} 2>&1 \
-	    | tee ${LOG_DIR}/output.log
+        ${TIME} -f "execution time %e (s)" \
+        ${PINNING} ${DIR}/bin/launch_bench_nopid ${BENCH_RUN} 2>&1 \
+        | sudo tee ${LOG_DIR}/output.log
+        elif [[ "x${BENCH_NAME}" =~ "xspeccpu" ]]; then
+        ${TIME} -f "execution time %e (s)" \
+        ${PINNING} ${DIR}/bin/launch_bench_nopid ${BENCH_RUN} < ${BENCH_ARG} 2>&1 \
+        | sudo tee ${LOG_DIR}/output.log
     else
-	${TIME} -f "execution time %e (s)" \
-	    ${PINNING} ${DIR}/bin/launch_bench ${BENCH_RUN} 2>&1 \
-	    | tee ${LOG_DIR}/output.log
+        if [[ "x${LLVM_INSTRUMENT_MODE}" == "xon" ]]; then
+            ${TIME} -f "execution time %e (s)" \
+            ${PINNING} ${BENCH_RUN} 2>&1 \
+            | sudo tee ${LOG_DIR}/output.log
+        else
+            ${TIME} -f "execution time %e (s)" \
+            ${PINNING} ${DIR}/bin/launch_bench ${BENCH_RUN} 2>&1 \
+            | sudo tee ${LOG_DIR}/output.log
+        fi
     fi
-
+    
     sudo killall -9 memory_stat.sh
     cat /proc/vmstat | grep -e thp -e htmm -e pgmig > ${LOG_DIR}/after_vmstat.log
     sleep 2
     python3 ${DIR}/scripts/process_numa_fp.py ${LOG_DIR}/${MEM_FP_FILE} ${LOG_DIR}/${BENCH_NAME}
-
+    
     if [[ "x${BENCH_NAME}" == "xbtree" ]]; then
-	cat ${LOG_DIR}/output.log | grep Throughput \
-	    | awk ' NR%20==0 { print sum ; sum = 0 ; next} { sum+=$3 }' \
-	    > ${LOG_DIR}/throughput.out
-    elif [[ "x${BENCH_NAME}" =~ "xsilo" ]]; then
-	cat ${LOG_DIR}/output.log | grep -e '0 throughput' -e '5 throughput' \
-	    | awk ' { print $4 }' > ${LOG_DIR}/throughput.out
+        cat ${LOG_DIR}/output.log | grep Throughput \
+        | awk ' NR%20==0 { print sum ; sum = 0 ; next} { sum+=$3 }' \
+        > ${LOG_DIR}/throughput.out
+        elif [[ "x${BENCH_NAME}" =~ "xsilo" ]]; then
+        cat ${LOG_DIR}/output.log | grep -e '0 throughput' -e '5 throughput' \
+        | awk ' { print $4 }' > ${LOG_DIR}/throughput.out
     fi
-
+    
     sudo dmesg -c > ${LOG_DIR}/dmesg.txt
     # disable htmm
     sudo ${DIR}/scripts/set_htmm_memcg.sh htmm $$ disable
@@ -185,9 +205,7 @@ function func_usage() {
     echo
 }
 
-
 ################################ Main ##################################
-
 if [ "$#" == 0 ]; then
     echo "Error: no arguments"
     func_usage
@@ -197,68 +215,72 @@ fi
 # get options:
 while (( "$#" )); do
     case "$1" in
-	-B|--benchmark)
-	    if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-		BENCH_NAME=( "$2" )
-		shift 2
-	    else
-		echo "Error: Argument for $1 is missing" >&2
-		func_usage
-		exit -1
-	    fi
-	    ;;
-	-V|--version)
-	    if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-		VER=( "$2" )
-		shift 2
-	    else
-		func_usage
-		exit -1
-	    fi
-	    ;;
-	-P|--perf)
-	    CONFIG_PERF=on
-	    shift 1
-	    ;;
-	-R|--ratio)
-	    if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-		NVM_RATIO="$2"
-		shift 2
-	    else
-		func_usage
-		exit -1
-	    fi
-	    ;;
-	-D|--dram)
-	    if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
-		STATIC_DRAM="$2"
-		shift 2
-	    else
-		func_usage
-		exit -1
-	    fi
-	    ;;
-	-NS|--nosplit)
-	    CONFIG_NS=on
-	    shift 1
-	    ;;
-	-NW|--nowarm)
-	    CONFIG_NW=on
-	    shift 1
-	    ;;
-	--cxl)
-	    CONFIG_CXL_MODE=on
-	    shift 1
-	    ;;
-	-H|-?|-h|--help|--usage)
-	    func_usage
-	    exit
-	    ;;
-	*)
-	    echo "Error: Invalid option $1"
-	    func_usage
-	    exit -1
-	    ;;
+        -B|--benchmark)
+            if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+                BENCH_NAME=( "$2" )
+                shift 2
+            else
+                echo "Error: Argument for $1 is missing" >&2
+                func_usage
+                exit -1
+            fi
+        ;;
+        -V|--version)
+            if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+                VER=( "$2" )
+                shift 2
+            else
+                func_usage
+                exit -1
+            fi
+        ;;
+        -P|--perf)
+            CONFIG_PERF=on
+            shift 1
+        ;;
+        -R|--ratio)
+            if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+                NVM_RATIO="$2"
+                shift 2
+            else
+                func_usage
+                exit -1
+            fi
+        ;;
+        -D|--dram)
+            if [ -n "$2" ] && [ ${2:0:1} != "-" ]; then
+                STATIC_DRAM="$2"
+                shift 2
+            else
+                func_usage
+                exit -1
+            fi
+        ;;
+        -NS|--nosplit)
+            CONFIG_NS=on
+            shift 1
+        ;;
+        -NW|--nowarm)
+            CONFIG_NW=on
+            shift 1
+        ;;
+        --cxl)
+            CONFIG_CXL_MODE=on
+            shift 1
+        ;;
+        --instru)
+            LLVM_INSTRUMENT_MODE=on
+            shift 1
+        ;;
+        -H|-?|-h|--help|--usage)
+            func_usage
+            exit
+        ;;
+        *)
+            echo "Error: Invalid option $1"
+            func_usage
+            exit -1
+        ;;
     esac
 done
 

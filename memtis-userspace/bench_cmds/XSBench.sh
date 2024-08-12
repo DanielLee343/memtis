@@ -1,7 +1,12 @@
 #!/bin/bash
 
 BIN=/mnt/newdrive/memtis/memtis-userspace/bench_dir/XSBench/openmp-threading
-BENCH_RUN="${BIN}/XSBench -t 20 -g 130000 -p 10000000"
+if [[ -z "$1" ]]; then
+  BENCH_RUN="${BIN}XSBench -t 24 -g 130000 -p 10000000"
+else
+  BENCH_RUN="${BIN}/XSBench_instru -t 24 -g 130000 -p 10000000"
+fi
+# BENCH_RUN="${BIN}/XSBench -t 24 -g 130000 -p 10000000"
 BENCH_DRAM=""
 
 # 65219 MB
