@@ -1,0 +1,657 @@
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c graph500.c -o graph500.o
+In file included from graph500.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+graph500.c:168:9: warning: variable 't' is uninitialized when used here [-Wuninitialized]
+  168 |     if (t >= nvtx_connected && m < NBFS) {
+      |         ^
+graph500.c:122:15: note: initialize the variable 't' to silence this warning
+  122 |   int64_t k, t, nvtx_connected = 0;
+      |               ^
+      |                = 0
+2 warnings generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c omp-csr/omp-csr.c -o omp-csr/omp-csr.o
+In file included from omp-csr/omp-csr.c:5:
+In file included from omp-csr/../compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c options.c -o options.o
+In file included from options.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c rmat.c -o rmat.o
+In file included from rmat.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c kronecker.c -o kronecker.o
+In file included from kronecker.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c verify.c -o verify.o
+In file included from verify.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c prng.c -o prng.o
+In file included from prng.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c timer.c -o timer.o
+In file included from timer.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c xalloc.c -o xalloc.o
+In file included from xalloc.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c generator/splittable_mrg.c -o generator/splittable_mrg.o
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c generator/graph_generator.c -o generator/graph_generator.o
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c generator/make_graph.c -o generator/make_graph.o
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -c generator/utils.c -o generator/utils.o
+clang graph500.o omp-csr/omp-csr.o options.o rmat.o kronecker.o verify.o prng.o timer.o xalloc.o generator/splittable_mrg.o generator/graph_generator.o generator/make_graph.o generator/utils.o -flto -fopenmp -lm -lrt -o omp-csr/omp-csr
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c graph500_instru.c -o graph500_instru_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from graph500_instru.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+graph500_instru.c:204:9: warning: variable 't' is uninitialized when used here [-Wuninitialized]
+  204 |     if (t >= nvtx_connected && m < NBFS) {
+      |         ^
+graph500_instru.c:158:15: note: initialize the variable 't' to silence this warning
+  158 |   int64_t k, t, nvtx_connected = 0;
+      |               ^
+      |                = 0
+Inspecting module: graph500_instru.c
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: launch_bench
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: run_bfs
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: output_results
+instrumented: get_v0_from_edge
+instrumented: get_v1_from_edge
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: statistics
+instrumented: dcmp
+instrumented: dcmp
+instru_num: 130
+2 warnings generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c omp-csr/omp-csr.c -o omp-csr/omp-csr_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from omp-csr/omp-csr.c:5:
+In file included from omp-csr/../compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: omp-csr/omp-csr.c
+instrumented: find_nv
+instrumented: find_nv
+instrumented: find_nv
+instrumented: alloc_graph
+instrumented: alloc_graph
+instrumented: alloc_graph
+instrumented: get_v0_from_edge
+instrumented: get_v1_from_edge
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: prefix_sum
+instrumented: scatter_edge
+instrumented: pack_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: pack_vtx_edges
+instrumented: i64cmp
+instrumented: i64cmp
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: make_bfs_tree
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: bfs_top_down_step
+instrumented: fill_bitmap_from_queue
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: bfs_bottom_up_step
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: fill_queue_from_bitmap
+instrumented: bm_reset
+instrumented: bm_set_bit_atomic
+instrumented: bm_get_bit
+instrumented: bm_get_next_bit
+instrumented: bm_get_next_bit
+instru_num: 94
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c options.c -o options_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from options.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: options.c
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instrumented: get_options
+instru_num: 65
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c rmat.c -o rmat_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from rmat.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: rmat.c
+instrumented: permute_vertex_labels
+instrumented: permute_vertex_labels
+instrumented: permute_vertex_labels
+instrumented: randpermute_int64_t
+instrumented: randpermute_int64_t
+instrumented: randpermute_int64_t
+instrumented: randpermute_int64_t
+instrumented: write_edge
+instrumented: write_edge
+instrumented: get_v0_from_edge
+instrumented: get_v1_from_edge
+instrumented: take_i64
+instrumented: release_i64
+instrumented: release_i64
+instrumented: randpermute_packed_edge
+instrumented: randpermute_packed_edge
+instrumented: randpermute_packed_edge
+instrumented: randpermute_packed_edge
+instrumented: randpermute_packed_edge
+instrumented: randpermute_packed_edge
+instrumented: randpermute_packed_edge
+instrumented: randpermute_packed_edge
+instrumented: release_pe
+instrumented: release_pe
+instrumented: rmat_edge
+instrumented: rmat_edge
+instrumented: rmat_edge
+instrumented: rmat_edge
+instrumented: rmat_edge
+instru_num: 29
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c kronecker.c -o kronecker_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from kronecker.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: kronecker.c
+instru_num: 0
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c verify.c -o verify_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from verify.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: verify.c
+instrumented: verify_bfs_tree
+instrumented: get_v0_from_edge
+instrumented: get_v1_from_edge
+instru_num: 3
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c prng.c -o prng_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from prng.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: prng.c
+instrumented: init_random
+instrumented: init_random
+instrumented: init_random
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instru_num: 8
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c timer.c -o timer_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from timer.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: timer.c
+instrumented: toc
+instrumented: toc
+instrumented: toc
+instrumented: toc
+instru_num: 4
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c xalloc.c -o xalloc_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+In file included from xalloc.c:4:
+In file included from ./compat.h:14:
+In file included from /usr/lib/llvm-17/lib/clang/17/include/inttypes.h:21:
+In file included from /usr/include/inttypes.h:25:
+/usr/include/features.h:187:3: warning: "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE" [-W#warnings]
+  187 | # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+      |   ^
+Inspecting module: xalloc.c
+instru_num: 0
+1 warning generated.
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c generator/splittable_mrg.c -o generator/splittable_mrg_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+Inspecting module: generator/splittable_mrg.c
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_apply_transition
+instrumented: mrg_get_uint_orig
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_orig_step
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instrumented: mrg_seed
+instru_num: 77
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c generator/graph_generator.c -o generator/graph_generator_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+Inspecting module: generator/graph_generator.c
+instrumented: write_edge
+instrumented: write_edge
+instru_num: 2
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c generator/make_graph.c -o generator/make_graph_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+Inspecting module: generator/make_graph.c
+instrumented: make_graph
+instrumented: make_random_numbers
+instru_num: 2
+clang -g -std=c99 -Wall -O3 -march=native -fopenmp -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I./generator -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -c generator/utils.c -o generator/utils_instru.o
+clang: warning: -lrtlib: 'linker' input unused [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-L/mnt/newdrive/compiler_assisted' [-Wunused-command-line-argument]
+Inspecting module: generator/utils.c
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instrumented: make_mrg_seed
+instru_num: 5
+clang graph500_instru_instru.o omp-csr/omp-csr_instru.o options_instru.o rmat_instru.o kronecker_instru.o verify_instru.o prng_instru.o timer_instru.o xalloc_instru.o generator/splittable_mrg_instru.o generator/graph_generator_instru.o generator/make_graph_instru.o generator/utils_instru.o -flto -fopenmp -lm -lrt -fpass-plugin=/mnt/newdrive/compiler_assisted/build/passes/RuntimeAddrPass.so -lrtlib -L/mnt/newdrive/compiler_assisted -o omp-csr/omp-csr_instru
