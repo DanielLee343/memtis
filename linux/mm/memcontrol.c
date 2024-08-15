@@ -7586,7 +7586,6 @@ static int memcg_htmm_show(struct seq_file *m, void *v)
 static ssize_t memcg_htmm_write(struct kernfs_open_file *of,
 	char *buf, size_t nbytes, loff_t off)
 {
-	printk(KERN_INFO "memcg_htmm_write called\n");
     struct mem_cgroup *memcg = mem_cgroup_from_css(of_css(of));
     int nid;
 
@@ -7604,15 +7603,18 @@ static ssize_t memcg_htmm_write(struct kernfs_open_file *of,
     }
     for_each_node_state(nid, N_MEMORY) {
 	struct pglist_data *pgdat = NODE_DATA(nid);
-	
+	printk(KERN_INFO "wreit cfg to node: %d\n", nid);
 	if (memcg->htmm_enabled) {
+		printk(KERN_INFO "enabled goes here\n");
 	    WRITE_ONCE(pgdat->kswapd_failures, MAX_RECLAIM_RETRIES);
 	    add_memcg_to_kmigraterd(memcg, nid);
 	} else {
+		printk(KERN_INFO "disabled goes here\n");
 	    WRITE_ONCE(pgdat->kswapd_failures, 0);
 	    del_memcg_from_kmigraterd(memcg, nid);
 	}
     }
+	printk(KERN_INFO "memcg_htmm_write\n");
 
     return nbytes;
 }
@@ -7629,7 +7631,6 @@ static struct cftype memcg_htmm_file[] = {
 
 static int __init mem_cgroup_htmm_init(void)
 {
-	printk(KERN_INFO "mem_cgroup_htmm_init called\n");
     WARN_ON(cgroup_add_dfl_cftypes(&memory_cgrp_subsys,
 		memcg_htmm_file));
     return 0;
@@ -7769,7 +7770,6 @@ static ssize_t memcg_per_node_max_write(struct kernfs_open_file *of,
 
 static int pgdat_memcg_htmm_init(struct pglist_data *pgdat)
 {
-	printk(KERN_INFO "pgdat_memcg_htmm_init called\n");
     pgdat->memcg_htmm_file = kzalloc(sizeof(struct cftype) * 2, GFP_KERNEL);
     if (!pgdat->memcg_htmm_file) {
 	printk("error: fails to allocate pgdat->memcg_htmm_file\n");

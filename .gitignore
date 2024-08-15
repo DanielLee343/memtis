@@ -2,6 +2,5 @@
 *.o
 .vscode
 
-memtis-userspace/bench_dir/gapbs
 memtis-userspace/bin/
 memtis-userspace/results/
