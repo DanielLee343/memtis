@@ -1,6 +1,6 @@
 *.log
 *.o
 .vscode
-
+memtis-userspace/test_damo
 memtis-userspace/bin/
 memtis-userspace/results/
